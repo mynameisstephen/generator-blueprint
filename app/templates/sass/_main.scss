@@ -1,0 +1,12 @@
+@import "base.normalize";
+
+@import "settings.compass";<%
+	if (optionResponsive) {
+		print('\n@import "settings.foundation";');
+	}  %>
+<%
+	if (optionIE8) {
+		print('\n@import "base.ie8grid";')
+	}
+%>
+@import "base.spritesheets";

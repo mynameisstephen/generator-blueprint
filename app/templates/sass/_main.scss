@@ -5,7 +5,7 @@
 		print('\n@import "settings.foundation";');
 	}  %>
 <%
-	if (optionIE8) {
+	if (optionResponsive && optionIE8) {
 		print('\n@import "base.ie8grid";')
 	}
 %>

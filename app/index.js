@@ -11,7 +11,7 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 
 		this.on('end', function () {
 			if (!this.options['skip-install']) {
-				process.chdir(process.cwd() + '/source');
+				process.chdir(process.cwd() + '/' + this.projectSourceRoot);
 
 				// We need to do npm install before bower since bower runs
 				// a post install grunt task.
@@ -48,23 +48,80 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 			'message': 'Who is the project author?',
 			'default': 'Stephen Nolan'
 		}, {
-			'type': 'confirm',
 			'name': 'optionIE8',
+			'type': 'confirm',
 			'message': 'Are you supporting IE8?',
 			'default': true
 		}, {
-			'type': 'confirm',
 			'name': 'optionResponsive',
+			'type': 'confirm',
 			'message': 'Is it responsive?',
+			'default': true
+		}, {
+			'name': 'projectSourceRoot',
+			'message': 'What is the path to the project source root?',
+			'default': 'source'
+		}, {
+			'name': 'projectDeployRoot',
+			'message': 'What is the path to the project deploy root?',
+			'default': 'deploy'
+		}, {
+			'name': 'optionCreateIndex',
+			'type': 'confirm', 
+			'message': 'Create index.html?',
 			'default': true
 		}];
 
 		this.prompt(prompts, function (props) {
+			var sourceDirectories = null;
+			var deployDirectories = null;
+
 			this.projectName = props.projectName;
 			this.projectDescription = props.projectDescription;
 			this.projectAuthor = props.projectAuthor;
 			this.optionIE8 = props.optionIE8;
 			this.optionResponsive = props.optionResponsive;
+			this.projectSourceRoot = props.projectSourceRoot;
+			this.projectDeployRoot = props.projectDeployRoot;
+			this.optionCreateIndex = props.optionCreateIndex;
+
+			sourceDirectories = this.projectSourceRoot.split(/[\\/]+/);
+			deployDirectories = this.projectDeployRoot.split(/[\\/]+/);
+
+			if (sourceDirectories.length > 0) {
+				if (sourceDirectories[0] == '') {
+					sourceDirectories.unshift();
+				}
+			}
+
+			if (sourceDirectories.length > 0) {
+				if (sourceDirectories[sourceDirectories.length - 1] == '') {
+					sourceDirectories.pop();
+				}
+			}
+
+			if (deployDirectories.length > 0) {
+				if (deployDirectories[0] == '') {
+					deployDirectories.unshift();
+				}
+			}
+
+			if (deployDirectories.length > 0) {
+				if (deployDirectories[deployDirectories.length - 1] == '') {
+					deployDirectories.pop();
+				}
+			}
+
+			while (sourceDirectories[0] == deployDirectories[0]) {
+				sourceDirectories.shift();
+				deployDirectories.shift();
+			}
+
+			this.pathSourceToDeploy = '';
+			for (var d = 0; d < sourceDirectories.length; d++) {
+				this.pathSourceToDeploy = this.pathSourceToDeploy + '../';
+			}
+			this.pathSourceToDeploy = this.pathSourceToDeploy + deployDirectories.join('/');
 
 			done();
 		}.bind(this));
@@ -74,16 +131,16 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 	  	var depsBower = [];
 	  	var depsGrunt = [];
 
-		this.mkdir('deploy');
+		this.mkdir(this.projectDeployRoot);
 
-		this.mkdir('source');
-		this.mkdir('source/fonts');
-		this.mkdir('source/images');
-		this.mkdir('source/images/.spritesheets');
-		this.mkdir('source/js');
-		this.mkdir('source/sass');
+		this.mkdir(this.projectSourceRoot);
+		this.mkdir(this.projectSourceRoot + '/fonts');
+		this.mkdir(this.projectSourceRoot + '/images');
+		this.mkdir(this.projectSourceRoot + '/images/.spritesheets');
+		this.mkdir(this.projectSourceRoot + '/js');
+		this.mkdir(this.projectSourceRoot + '/sass');
 
-		this.copy('.bowerrc', 'source/.bowerrc');
+		this.copy('.bowerrc', this.projectSourceRoot + '/.bowerrc');
 		
 		depsBower.push('"normalize-css": "~3.0.1"');
 		depsBower.push('"modernizr": "~2.7.2"');
@@ -104,9 +161,9 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 			}		
 		}
 		this.depsBower = depsBower.join(',\n\t\t');
-		this.template('_bower.json', 'source/bower.json');
+		this.template('_bower.json', this.projectSourceRoot + '/bower.json');
 
-		this.copy('config.rb', 'source/config.rb');
+		this.copy('config.rb', this.projectSourceRoot + '/config.rb');
 
 		this.bannerCSS = '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\\n';
 		this.bannerJS = '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\\n\\n';
@@ -124,23 +181,25 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 			depsGrunt.push('\'vendor/modernizr/modernizr.js\'');
 		}
 		this.depsGrunt = depsGrunt.join(',\n\t\t\t\t\t');
-		this.template('_gruntfile.js', 'source/gruntfile.js');
+		this.template('_gruntfile.js', this.projectSourceRoot + '/gruntfile.js');
 
-		this.template('_package.json', 'source/package.json');
+		this.template('_package.json', this.projectSourceRoot + '/package.json');
 
-		this.copy('sass/_base.spritesheets.scss', 'source/sass/_base.spritesheets.scss');
-		this.copy('sass/_settings.compass.scss', 'source/sass/_settings.compass.scss');
+		this.copy('sass/_base.spritesheets.scss', this.projectSourceRoot + '/sass/_base.spritesheets.scss');
+		this.copy('sass/_settings.compass.scss', this.projectSourceRoot + '/sass/_settings.compass.scss');
 		if (this.optionResponsive) {
 			if (this.optionIE8) {
-				this.copy('sass/_base.ie8grid.scss', 'source/sass/_base.ie8grid.scss');
-				this.copy('sass/_settings.foundation-ie8.scss', 'source/sass/_settings.foundation.scss');
+				this.copy('sass/_base.ie8grid.scss', this.projectSourceRoot + '/sass/_base.ie8grid.scss');
+				this.copy('sass/_settings.foundation-ie8.scss', this.projectSourceRoot + '/sass/_settings.foundation.scss');
 			} else {
-				this.copy('sass/_settings.foundation.scss', 'source/sass/_settings.foundation.scss');				
+				this.copy('sass/_settings.foundation.scss', this.projectSourceRoot + '/sass/_settings.foundation.scss');				
 			}
 		}
-		this.template('sass/_main.scss', 'source/sass/main.scss');
+		this.template('sass/_main.scss', this.projectSourceRoot + '/sass/main.scss');
 
-		this.copy('index.html', 'deploy/index.html');
+		if (this.optionCreateIndex) {
+			this.copy('index.html', this.projectDeployRoot + '/index.html');
+		}
 	},
 
   	projectfiles: function () {

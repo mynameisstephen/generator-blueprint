@@ -11,10 +11,10 @@ module.exports = function(grunt) {
 			'stage-css': 'bin/css',
 			'stage-js': 'bin/js',
 
-			'prod-css': '../deploy/css',
-			'prod-fonts': '../deploy/fonts',
-			'prod-images': '../deploy/images',
-			'prod-js': '../deploy/js'
+			'prod-css': '<%= pathSourceToDeploy %>/css',
+			'prod-fonts': '<%= pathSourceToDeploy %>/fonts',
+			'prod-images': '<%= pathSourceToDeploy %>/images',
+			'prod-js': '<%= pathSourceToDeploy %>/js'
 		},
 
 		'compass': {
@@ -89,25 +89,25 @@ module.exports = function(grunt) {
 				'expand': true,
 				'cwd': 'bin/css',
 				'src': '*.min.css',
-				'dest': '../deploy/css'
+				'dest': '<%= pathSourceToDeploy %>/css'
 			},
 			'deploy-fonts': {
 				'expand': true,				
 				'cwd': 'fonts',
 				'src': '*',
-				'dest': '../deploy/fonts'
+				'dest': '<%= pathSourceToDeploy %>/fonts'
 			},
 			'deploy-images': {
 				'expand': true,
 				'cwd': 'images',
 				'src': ['**', '!.spritesheets'],
-				'dest': '../deploy/images/'
+				'dest': '<%= pathSourceToDeploy %>/images/'
 			},
 			'deploy-js': {
 				'expand': true,
 				'cwd': 'bin/js',
 				'src': '*.min.js',
-				'dest': '../deploy/js'
+				'dest': '<%= pathSourceToDeploy %>/js'
 			}			
 		},
 

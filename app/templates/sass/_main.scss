@@ -6,7 +6,7 @@
 	}  %>
 <%
 	if (optionResponsive && optionIE8) {
-		print('\n@import "base.ie8grid";')
+		print('\n@import "base.ie8grid";');
 	}
 %>
 @import "base.spritesheets";

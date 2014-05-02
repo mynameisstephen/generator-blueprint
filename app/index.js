@@ -64,10 +64,10 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 		}, {
 			'name': 'projectDeployRoot',
 			'message': 'What is the path to the project deploy root?',
-			'default': 'deploy'
+			'default': 'publish'
 		}, {
 			'name': 'optionCreateIndex',
-			'type': 'confirm', 
+			'type': 'confirm',
 			'message': 'Create index.html?',
 			'default': true
 		}];
@@ -141,7 +141,7 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 		this.mkdir(this.projectSourceRoot + '/sass');
 
 		this.copy('.bowerrc', this.projectSourceRoot + '/.bowerrc');
-		
+
 		depsBower.push('"normalize-css": "~3.0.1"');
 		depsBower.push('"modernizr": "~2.7.2"');
 		if (this.optionIE8) {
@@ -158,7 +158,7 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 
 			if (this.optionResponsive) {
 				depsBower.push('"foundation": "~5.2.2"');
-			}		
+			}
 		}
 		this.depsBower = depsBower.join(',\n\t\t');
 		this.template('_bower.json', this.projectSourceRoot + '/bower.json');
@@ -192,7 +192,7 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 				this.copy('sass/_base.ie8grid.scss', this.projectSourceRoot + '/sass/_base.ie8grid.scss');
 				this.copy('sass/_settings.foundation-ie8.scss', this.projectSourceRoot + '/sass/_settings.foundation.scss');
 			} else {
-				this.copy('sass/_settings.foundation.scss', this.projectSourceRoot + '/sass/_settings.foundation.scss');				
+				this.copy('sass/_settings.foundation.scss', this.projectSourceRoot + '/sass/_settings.foundation.scss');
 			}
 		}
 		this.template('sass/_main.scss', this.projectSourceRoot + '/sass/main.scss');

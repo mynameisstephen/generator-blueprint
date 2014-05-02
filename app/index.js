@@ -136,9 +136,9 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 		this.mkdir(this.projectSourceRoot);
 		this.mkdir(this.projectSourceRoot + '/fonts');
 		this.mkdir(this.projectSourceRoot + '/images');
-		this.mkdir(this.projectSourceRoot + '/images/.spritesheets');
 		this.mkdir(this.projectSourceRoot + '/js');
 		this.mkdir(this.projectSourceRoot + '/sass');
+		this.mkdir(this.projectSourceRoot + '/sprites');
 
 		this.copy('.bowerrc', this.projectSourceRoot + '/.bowerrc');
 

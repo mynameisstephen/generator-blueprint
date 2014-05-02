@@ -41,15 +41,15 @@ module.exports = function(grunt) {
 				'cwd': 'bin/css/',
 				'src': ['*.css', '!*.min.css'],
 				'dest': 'bin/css/',
-				'ext': '.min.css'		
+				'ext': '.min.css'
 			},
 			'js': {
 				'expand': true,
 				'cwd': 'bin/js/',
 				'src': ['*.js', '!*.min.js'],
 				'dest': 'bin/js/',
-				'ext': '.min.js'		
-			}			
+				'ext': '.min.js'
+			}
 		},
 
 		'cssmin': {
@@ -70,12 +70,12 @@ module.exports = function(grunt) {
 			'stage': {
 				'options': {
 					'banner': '<%= bannerJS %>'
-				},				
+				},
 				'expand': true,
 				'cwd': 'bin/js/',
 				'src': ['*.js', '!*.min.js'],
 				'dest': 'bin/js/',
-				'ext': '.min.js'				
+				'ext': '.min.js'
 			}
 		},
 
@@ -92,23 +92,23 @@ module.exports = function(grunt) {
 				'dest': '<%= pathSourceToDeploy %>/css'
 			},
 			'deploy-fonts': {
-				'expand': true,				
+				'expand': true,
 				'cwd': 'fonts',
 				'src': '*',
 				'dest': '<%= pathSourceToDeploy %>/fonts'
 			},
 			'deploy-images': {
-				'expand': true,
-				'cwd': 'images',
-				'src': ['**', '!.spritesheets'],
-				'dest': '<%= pathSourceToDeploy %>/images/'
+				'files': [
+					{ 'expand': true, 'cwd': 'images', 'src': '**', 'dest': '<%= pathSourceToDeploy %>/images' },
+					{ 'expand': true, 'cwd': 'bin/images', 'src': '**', 'dest': '<%= pathSourceToDeploy %>/images' }
+				]
 			},
 			'deploy-js': {
 				'expand': true,
 				'cwd': 'bin/js',
 				'src': '*.min.js',
 				'dest': '<%= pathSourceToDeploy %>/js'
-			}			
+			}
 		},
 
 		'watch': {
@@ -122,7 +122,7 @@ module.exports = function(grunt) {
 			}
 		}
 	});
-	
+
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-compass');
 	grunt.loadNpmTasks('grunt-contrib-concat');
@@ -133,10 +133,10 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
 
 	grunt.registerTask(
-		'build-dev-css', 
+		'build-dev-css',
 		[
-			'clean:stage-css', 
-			'compass:build', 
+			'clean:stage-css',
+			'compass:build',
 			'rename:css',
 			'clean:prod-css',
 			'clean:prod-fonts',
@@ -148,10 +148,10 @@ module.exports = function(grunt) {
 	);
 
 	grunt.registerTask(
-		'build-dev-js', 
+		'build-dev-js',
 		[
-			'clean:stage-js', 
-			'concat:vendor', 
+			'clean:stage-js',
+			'concat:vendor',
 			'rename:js',
 			'clean:prod-js',
 			'copy:deploy-js'
@@ -161,10 +161,10 @@ module.exports = function(grunt) {
 	grunt.registerTask('build-dev', ['build-dev-css', 'build-dev-js']);
 
 	grunt.registerTask(
-		'build-prod-css', 
+		'build-prod-css',
 		[
-			'clean:stage-css', 
-			'compass:build', 
+			'clean:stage-css',
+			'compass:build',
 			'cssmin:stage',
 			'clean:prod-css',
 			'clean:prod-fonts',
@@ -176,10 +176,10 @@ module.exports = function(grunt) {
 	);
 
 	grunt.registerTask(
-		'build-prod-js', 
+		'build-prod-js',
 		[
-			'clean:stage-js', 
-			'concat:vendor', 
+			'clean:stage-js',
+			'concat:vendor',
 			'uglify:stage',
 			'clean:prod-js',
 			'copy:deploy-js'

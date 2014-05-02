@@ -3,14 +3,16 @@
 add_import_path "vendor/foundation/scss"
 
 # Set this to the root of your project when deployed:
-http_path = "/"
-css_dir = "css"
-css_path = "bin/css"
+http_path = "/bin/"
+css_dir = "bin/css"
+
 fonts_dir = "fonts"
-images_dir = "images"
-generated_images_dir = "images/spritesheets"
 javascripts_dir = "js"
 sass_dir = "sass"
+
+images_dir = "images"
+generated_images_dir = "bin/images"
+sprite_load_path << "sprites"
 
 # You can select your preferred output style here (can be overridden via the command line):
 # output_style = :expanded or :nested or :compact or :compressed

@@ -186,6 +186,7 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 		this.template('_package.json', this.projectSourceRoot + '/package.json');
 
 		this.copy('sass/_base.spritesheets.scss', this.projectSourceRoot + '/sass/_base.spritesheets.scss');
+		this.copy('sass/_base.typography.scss', this.projectSourceRoot + '/sass/_base.typography.scss');
 		this.copy('sass/_settings.compass.scss', this.projectSourceRoot + '/sass/_settings.compass.scss');
 		if (this.optionResponsive) {
 			if (this.optionIE8) {

@@ -6,7 +6,7 @@ add_import_path "vendor/foundation/scss"
 http_path = "/bin/"
 css_dir = "bin/css"
 
-fonts_dir = "fonts"
+fonts_dir = "bin/fonts"
 javascripts_dir = "js"
 sass_dir = "sass"
 

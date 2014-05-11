@@ -4,7 +4,6 @@ var path = require('path');
 var yeoman = require('yeoman-generator');
 var chalk = require('chalk');
 
-
 var BlueprintGenerator = yeoman.generators.Base.extend({
 	init: function () {
 		this.pkg = require('../package.json');
@@ -128,8 +127,7 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 	},
 
   	app: function () {
-	  	var depsBower = [];
-	  	var depsGrunt = [];
+  		var deps = {};
 
 		this.mkdir(this.projectDeployRoot);
 
@@ -142,48 +140,76 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 
 		this.copy('.bowerrc', this.projectSourceRoot + '/.bowerrc');
 
-		depsBower.push('"normalize-css": "~3.0.1"');
-		depsBower.push('"modernizr": "~2.7.2"');
+		deps['bower'] = [];
+
+		deps['bower'].push('"normalize-css": "~3.0.1"');
+		deps['bower'].push('"modernizr": "~2.7.2"');
+		deps['bower'].push('"requirejs": "~2.1.11"');
 		if (this.optionIE8) {
-			depsBower.push('"jquery": "~1.11.0"');
-			depsBower.push('"modernizr": "~2.7.2"');
+			deps['bower'].push('"html5shiv": "~3.7.2"');
+			deps['bower'].push('"jquery": "~1.11.0"');
 
 			if (this.optionResponsive) {
-				depsBower.push('"respondJS": "~1.4.2"');
-				depsBower.push('"foundation": "~4.3.2"');
+				deps['bower'].push('"respondJS": "~1.4.2"');
+				deps['bower'].push('"foundation": "~4.3.2"');
 			}
-			depsBower.push('"selectivizr": "https://github.com/keithclark/selectivizr.git#ed2f5e3e56f059ad256cc921e24ecc0e1855f18a"');
+			deps['bower'].push('"selectivizr": "https://github.com/keithclark/selectivizr.git#ed2f5e3e56f059ad256cc921e24ecc0e1855f18a"');
 		} else {
-			depsBower.push('"jquery": "~2.1.0"');
+			deps['bower'].push('"jquery": "~2.1.0"');
 
 			if (this.optionResponsive) {
-				depsBower.push('"foundation": "~5.2.2"');
+				deps['bower'].push('"foundation": "~5.2.2"');
 			}
 		}
-		this.depsBower = depsBower.join(',\n\t\t');
+		this.depsBower = deps['bower'].join(',\n\t\t');
 		this.template('_bower.json', this.projectSourceRoot + '/bower.json');
 
 		this.copy('config.rb', this.projectSourceRoot + '/config.rb');
 
 		this.bannerCSS = '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\\n';
 		this.bannerJS = '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\\n\\n';
+
+		deps['paths'] = [];
+		deps['libs'] = [];
+		deps['shims'] = [];
 		if (this.optionIE8) {
-			depsGrunt.push('\'vendor/html5shiv/dist/html5shiv.js\'');
-			depsGrunt.push('\'vendor/jquery/dist/jquery.js\'');
-			depsGrunt.push('\'vendor/modernizr/modernizr.js\'');
+			deps['paths'].push('\'vendor.html5shiv\': \'../vendor/html5shiv/dist/html5shiv\'');
+			deps['libs'].push('\'vendor.html5shiv\'');
+			deps['shims'].push('\'vendor.html5shiv\': {\n\t\t\t\t\t\t\t\'exports\': \'html5\'\n\t\t\t\t\t\t}');
+
+			deps['paths'].push('\'vendor.jquery\': \'../vendor/jquery/dist/jquery\'');
+			deps['libs'].push('\'vendor.jquery\'');
+			deps['shims'].push('\'vendor.jquery\': {\n\t\t\t\t\t\t\t\'exports\': \'$\'\n\t\t\t\t\t\t}');
+
+			deps['paths'].push('\'vendor.modernizr\': \'../vendor/modernizr/modernizr\'');
+			deps['libs'].push('\'vendor.modernizr\'');
+			deps['shims'].push('\'vendor.modernizr\': {\n\t\t\t\t\t\t\t\'exports\': \'Modernizr\'\n\t\t\t\t\t\t}');
 
 			if (this.optionResponsive) {
-				depsGrunt.push('\'vendor/selectivizr/selectivizr.js\'');
-				depsGrunt.push('\'vendor/respondJS/respond.src.js\'');
+				deps['paths'].push('\'vendor.selectivizr\': \'../vendor/selectivizr/selectivizr\'');
+				deps['libs'].push('\'vendor.selectivizr\'');
+	
+				deps['paths'].push('\'vendor.respond\': \'../vendor/respondJS/dest/respond.src\'');
+				deps['libs'].push('\'vendor.respond\'');
+				deps['shims'].push('\'vendor.respond\': {\n\t\t\t\t\t\t\t\'exports\': \'respond\'\n\t\t\t\t\t\t}');
 			}
 		} else {
-			depsGrunt.push('\'vendor/jquery/dist/jquery.js\'');
-			depsGrunt.push('\'vendor/modernizr/modernizr.js\'');
+			deps['paths'].push('\'vendor.jquery\': \'../vendor/jquery/dist/jquery\'');
+			deps['libs'].push('\'vendor.jquery\'');
+			deps['shims'].push('\'vendor.jquery\': {\n\t\t\t\t\t\t\t\'exports\': \'$\'\n\t\t\t\t\t\t}');
+
+			deps['paths'].push('\'vendor.modernizr\': \'../vendor/modernizr/modernizr\'');
+			deps['libs'].push('\'vendor.modernizr\'');
+			deps['shims'].push('\'vendor.modernizr\': {\n\t\t\t\t\t\t\t\'exports\': \'Modernizr\'\n\t\t\t\t\t\t}');
 		}
-		this.depsGrunt = depsGrunt.join(',\n\t\t\t\t\t');
+		this.depsVendorPaths = deps['paths'].join(',\n\t\t\t\t\t\t');
+		this.depsVendorLibs = deps['libs'].join(',\n\t\t\t\t\t\t');
+		this.depsVendorShims = deps['shims'].join(',\n\t\t\t\t\t\t');
 		this.template('_gruntfile.js', this.projectSourceRoot + '/gruntfile.js');
 
 		this.template('_package.json', this.projectSourceRoot + '/package.json');
+
+		this.write(this.projectSourceRoot + '/js/main.js', '');
 
 		this.copy('sass/_base.spritesheets.scss', this.projectSourceRoot + '/sass/_base.spritesheets.scss');
 		this.copy('sass/_base.typography.scss', this.projectSourceRoot + '/sass/_base.typography.scss');

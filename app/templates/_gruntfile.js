@@ -22,16 +22,24 @@ module.exports = function(grunt) {
 			}
 		},
 
-		'concat': {
-			'vendor': {
+		'requirejs': {
+			'compile': {
 				'options': {
-					'separator': ';'
-				},
-
-				'src': [
-					<%= depsGrunt %>
-				],
-				'dest': 'bin/js/vendor.js'
+					'name': 'main',
+					'baseUrl': 'js/',
+					'logLevel': 1,
+					'paths': {
+						<%= depsVendorPaths %>
+					},
+					'deps': [
+						<%= depsVendorLibs %>
+					],
+					'shim': {
+						<%= depsVendorShims %>
+					},		
+					'optimize': 'none',
+					'out': 'bin/js/main.js'
+				}
 			}
 		},
 
@@ -67,15 +75,16 @@ module.exports = function(grunt) {
 		},
 
 		'uglify': {
-			'stage': {
+			'main': {
 				'options': {
 					'banner': '<%= bannerJS %>'
 				},
-				'expand': true,
-				'cwd': 'bin/js/',
-				'src': ['*.js', '!*.min.js'],
-				'dest': 'bin/js/',
-				'ext': '.min.js'
+				'src': 'bin/js/main.js',
+				'dest': 'bin/js/main.min.js'
+			},
+			'requirejs': {
+				'src': 'bin/js/require.js',
+				'dest': 'bin/js/require.min.js'
 			}
 		},
 
@@ -83,6 +92,11 @@ module.exports = function(grunt) {
 			'normalize-css': {
 				'src': 'vendor/normalize-css/normalize.css',
 				'dest': 'sass/_base.normalize.scss'
+			},
+
+			'requirejs': {
+				'src': 'vendor/requirejs/require.js',
+				'dest': 'bin/js/require.js'
 			},
 
 			'deploy-css': {
@@ -125,7 +139,7 @@ module.exports = function(grunt) {
 
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-compass');
-	grunt.loadNpmTasks('grunt-contrib-concat');
+	grunt.loadNpmTasks('grunt-contrib-requirejs');
 	grunt.loadNpmTasks('grunt-contrib-rename');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -151,7 +165,8 @@ module.exports = function(grunt) {
 		'build-dev-js',
 		[
 			'clean:stage-js',
-			'concat:vendor',
+			'requirejs:compile',
+			'copy:requirejs',
 			'rename:js',
 			'clean:prod-js',
 			'copy:deploy-js'
@@ -179,8 +194,10 @@ module.exports = function(grunt) {
 		'build-prod-js',
 		[
 			'clean:stage-js',
-			'concat:vendor',
-			'uglify:stage',
+			'requirejs:compile',
+			'copy:requirejs',
+			'uglify:main',
+			'uglify:requirejs',
 			'clean:prod-js',
 			'copy:deploy-js'
 		]

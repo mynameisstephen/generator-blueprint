@@ -36,7 +36,7 @@ module.exports = function(grunt) {
 					],
 					'shim': {
 						<%= depsVendorShims %>
-					},		
+					},
 					'optimize': 'none',
 					'out': 'bin/js/main.js'
 				}
@@ -82,9 +82,14 @@ module.exports = function(grunt) {
 				'src': 'bin/js/main.js',
 				'dest': 'bin/js/main.min.js'
 			},
-			'requirejs': {
-				'src': 'bin/js/require.js',
-				'dest': 'bin/js/require.min.js'
+			'vendor': {
+				'files': [{
+					'expand': true,
+					'cwd': 'bin/js/',
+					'src': ['*.js', '!*.min.js', '!main*.js'],
+					'dest': 'bin/js/',
+					'ext': '.min.js'
+				}]
 			}
 		},
 
@@ -93,6 +98,14 @@ module.exports = function(grunt) {
 				'src': 'vendor/normalize-css/normalize.css',
 				'dest': 'sass/_base.normalize.scss'
 			},
+			<%
+				if (optionIE8) {
+					print('\n\t\t\t\'html5shiv\': {\n');
+					print('\t\t\t\t\'src\': \'vendor/html5shiv/dist/html5shiv.js\',\n');
+					print('\t\t\t\t\'dest\': \'bin/js/html5shiv.js\'\n');
+					print('\t\t\t},');
+				}
+			%>
 
 			'requirejs': {
 				'src': 'vendor/requirejs/require.js',
@@ -165,7 +178,10 @@ module.exports = function(grunt) {
 		'build-dev-js',
 		[
 			'clean:stage-js',
-			'requirejs:compile',
+			'requirejs:compile', <%
+				if (optionIE8) {
+					print('\n\t\t\t\'copy:html5shiv\',');
+				} %>
 			'copy:requirejs',
 			'rename:js',
 			'clean:prod-js',
@@ -194,10 +210,13 @@ module.exports = function(grunt) {
 		'build-prod-js',
 		[
 			'clean:stage-js',
-			'requirejs:compile',
+			'requirejs:compile', <%
+				if (optionIE8) {
+					print('\n\t\t\t\'copy:html5shiv\',');
+				} %>
 			'copy:requirejs',
 			'uglify:main',
-			'uglify:requirejs',
+			'uglify:vendor',
 			'clean:prod-js',
 			'copy:deploy-js'
 		]

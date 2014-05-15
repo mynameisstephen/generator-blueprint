@@ -173,10 +173,6 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 		deps['libs'] = [];
 		deps['shims'] = [];
 		if (this.optionIE8) {
-			deps['paths'].push('\'vendor.html5shiv\': \'../vendor/html5shiv/dist/html5shiv\'');
-			deps['libs'].push('\'vendor.html5shiv\'');
-			deps['shims'].push('\'vendor.html5shiv\': {\n\t\t\t\t\t\t\t\'exports\': \'html5\'\n\t\t\t\t\t\t}');
-
 			deps['paths'].push('\'vendor.jquery\': \'../vendor/jquery/dist/jquery\'');
 			deps['libs'].push('\'vendor.jquery\'');
 			deps['shims'].push('\'vendor.jquery\': {\n\t\t\t\t\t\t\t\'exports\': \'$\'\n\t\t\t\t\t\t}');
@@ -188,7 +184,7 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 			if (this.optionResponsive) {
 				deps['paths'].push('\'vendor.selectivizr\': \'../vendor/selectivizr/selectivizr\'');
 				deps['libs'].push('\'vendor.selectivizr\'');
-	
+
 				deps['paths'].push('\'vendor.respond\': \'../vendor/respondJS/dest/respond.src\'');
 				deps['libs'].push('\'vendor.respond\'');
 				deps['shims'].push('\'vendor.respond\': {\n\t\t\t\t\t\t\t\'exports\': \'respond\'\n\t\t\t\t\t\t}');
@@ -225,7 +221,7 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 		this.template('sass/_main.scss', this.projectSourceRoot + '/sass/main.scss');
 
 		if (this.optionCreateIndex) {
-			this.copy('index.html', this.projectDeployRoot + '/index.html');
+			this.template('_index.html', this.projectDeployRoot + '/index.html');
 		}
 	},
 

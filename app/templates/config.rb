@@ -3,22 +3,25 @@
 add_import_path "vendor/foundation/scss"
 
 # Set this to the root of your project when deployed:
-http_path = "/bin/"
-css_dir = "bin/css"
+http_path = "/"
 
-fonts_dir = "bin/fonts"
+css_dir = "bin/css"
+fonts_dir = "fonts"
 javascripts_dir = "js"
 sass_dir = "sass"
-
 images_dir = "images"
-generated_images_dir = "bin/images"
-sprite_load_path << "sprites"
+generated_images_dir = "bin/images/sprites"
+
+sprite_load_path = ["sprites"]
+
+http_stylesheets_path = "/css"
+http_generated_images_path = "/images/sprites"
 
 # You can select your preferred output style here (can be overridden via the command line):
 # output_style = :expanded or :nested or :compact or :compressed
 
 # To enable relative paths to assets via compass helper functions. Uncomment:
-relative_assets = true
+# relative_assets = true
 
 # To disable debugging comments that display the original location of your selectors. Uncomment:
 # line_comments = false

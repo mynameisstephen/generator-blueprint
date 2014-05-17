@@ -206,6 +206,7 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 		this.template('_package.json', this.projectSourceRoot + '/package.json');
 
 		this.write(this.projectSourceRoot + '/js/main.js', '');
+		this.write(this.projectSourceRoot + '/js/config.js', '');
 
 		this.copy('sass/_base.spritesheets.scss', this.projectSourceRoot + '/sass/_base.spritesheets.scss');
 		this.copy('sass/_base.typography.scss', this.projectSourceRoot + '/sass/_base.typography.scss');

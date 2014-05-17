@@ -26,6 +26,7 @@ module.exports = function(grunt) {
 			'compile': {
 				'options': {
 					'name': 'main',
+					'mainConfigFile': 'js/config.js',
 					'baseUrl': 'js/',
 					'logLevel': 1,
 					'paths': {

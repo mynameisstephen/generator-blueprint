@@ -1,4 +1,5 @@
 'use strict';
+var file = require('yeoman-generator').file;
 var util = require('util');
 var path = require('path');
 var yeoman = require('yeoman-generator');
@@ -12,16 +13,12 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 			if (!this.options['skip-install']) {
 				process.chdir(process.cwd() + '/' + this.projectSourceRoot);
 
-				// We need to do npm install before bower since bower runs
-				// a post install grunt task.
 				this.installDependencies({
-					'bower': false,
-					'npm': true,
 					'callback': function() {
-						this.installDependencies({
-							'bower': true,
-							'npm': false
-						});
+						file.copy(
+							'vendor/normalize-css/normalize.css',
+							'sass/_base.normalize.scss'
+						);
 					}.bind(this)
 				});
 			}
@@ -146,7 +143,6 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 		deps['bower'].push('"modernizr": "~2.7.2"');
 		deps['bower'].push('"requirejs": "~2.1.11"');
 		if (this.optionIE8) {
-			deps['bower'].push('"html5shiv": "~3.7.2"');
 			deps['bower'].push('"jquery": "~1.11.0"');
 
 			if (this.optionResponsive) {
@@ -177,10 +173,6 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 			deps['libs'].push('\'vendor.jquery\'');
 			deps['shims'].push('\'vendor.jquery\': {\n\t\t\t\t\t\t\t\'exports\': \'$\'\n\t\t\t\t\t\t}');
 
-			deps['paths'].push('\'vendor.modernizr\': \'../vendor/modernizr/modernizr\'');
-			deps['libs'].push('\'vendor.modernizr\'');
-			deps['shims'].push('\'vendor.modernizr\': {\n\t\t\t\t\t\t\t\'exports\': \'Modernizr\'\n\t\t\t\t\t\t}');
-
 			if (this.optionResponsive) {
 				deps['paths'].push('\'vendor.selectivizr\': \'../vendor/selectivizr/selectivizr\'');
 				deps['libs'].push('\'vendor.selectivizr\'');
@@ -193,10 +185,6 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 			deps['paths'].push('\'vendor.jquery\': \'../vendor/jquery/dist/jquery\'');
 			deps['libs'].push('\'vendor.jquery\'');
 			deps['shims'].push('\'vendor.jquery\': {\n\t\t\t\t\t\t\t\'exports\': \'$\'\n\t\t\t\t\t\t}');
-
-			deps['paths'].push('\'vendor.modernizr\': \'../vendor/modernizr/modernizr\'');
-			deps['libs'].push('\'vendor.modernizr\'');
-			deps['shims'].push('\'vendor.modernizr\': {\n\t\t\t\t\t\t\t\'exports\': \'Modernizr\'\n\t\t\t\t\t\t}');
 		}
 		this.depsVendorPaths = deps['paths'].join(',\n\t\t\t\t\t\t');
 		this.depsVendorLibs = deps['libs'].join(',\n\t\t\t\t\t\t');

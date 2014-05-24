@@ -95,18 +95,10 @@ module.exports = function(grunt) {
 		},
 
 		'copy': {
-			'normalize-css': {
-				'src': 'vendor/normalize-css/normalize.css',
-				'dest': 'sass/_base.normalize.scss'
+			'modernizr': {
+				'src': 'vendor/modernizr/modernizr.js',
+				'dest': 'bin/js/modernizr.js'
 			},
-			<%
-				if (optionIE8) {
-					print('\n\t\t\t\'html5shiv\': {\n');
-					print('\t\t\t\t\'src\': \'vendor/html5shiv/dist/html5shiv.js\',\n');
-					print('\t\t\t\t\'dest\': \'bin/js/html5shiv.js\'\n');
-					print('\t\t\t},');
-				}
-			%>
 
 			'requirejs': {
 				'src': 'vendor/requirejs/require.js',
@@ -179,10 +171,8 @@ module.exports = function(grunt) {
 		'build-dev-js',
 		[
 			'clean:stage-js',
-			'requirejs:compile', <%
-				if (optionIE8) {
-					print('\n\t\t\t\'copy:html5shiv\',');
-				} %>
+			'requirejs:compile',
+			'copy:modernizr',
 			'copy:requirejs',
 			'rename:js',
 			'clean:prod-js',
@@ -211,10 +201,8 @@ module.exports = function(grunt) {
 		'build-prod-js',
 		[
 			'clean:stage-js',
-			'requirejs:compile', <%
-				if (optionIE8) {
-					print('\n\t\t\t\'copy:html5shiv\',');
-				} %>
+			'requirejs:compile',
+			'copy:modernizr',
 			'copy:requirejs',
 			'uglify:main',
 			'uglify:vendor',

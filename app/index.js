@@ -201,7 +201,6 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 		this.copy('sass/_settings.compass.scss', this.projectSourceRoot + '/sass/_settings.compass.scss');
 		if (this.optionResponsive) {
 			if (this.optionIE8) {
-				this.copy('sass/_base.ie8grid.scss', this.projectSourceRoot + '/sass/_base.ie8grid.scss');
 				this.copy('sass/_settings.foundation-ie8.scss', this.projectSourceRoot + '/sass/_settings.foundation.scss');
 			} else {
 				this.copy('sass/_settings.foundation.scss', this.projectSourceRoot + '/sass/_settings.foundation.scss');

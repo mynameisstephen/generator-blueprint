@@ -4,10 +4,6 @@
 	if (optionResponsive) {
 		print('\n@import "settings.foundation";');
 	}  %>
-<%
-	if (optionResponsive && optionIE8) {
-		print('\n@import "base.ie8grid";');
-	}
-%>
+
 @import "base.spritesheets";
 @import "base.typography";

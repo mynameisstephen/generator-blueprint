@@ -164,6 +164,9 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 
 		this.bannerCSS = '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\\n';
 		this.bannerJS = '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\\n\\n';
+		this.template('_gruntfile.js', this.projectSourceRoot + '/gruntfile.js');
+
+		this.template('_package.json', this.projectSourceRoot + '/package.json');
 
 		deps['paths'] = [];
 		deps['libs'] = [];
@@ -171,7 +174,7 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 		if (this.optionIE8) {
 			deps['paths'].push('\'vendor.jquery\': \'../vendor/jquery/dist/jquery\'');
 			deps['libs'].push('\'vendor.jquery\'');
-			deps['shims'].push('\'vendor.jquery\': {\n\t\t\t\t\t\t\t\'exports\': \'$\'\n\t\t\t\t\t\t}');
+			deps['shims'].push('\'vendor.jquery\': {\n\t\t\t\'exports\': \'$\'\n\t\t}');
 
 			if (this.optionResponsive) {
 				deps['paths'].push('\'vendor.selectivizr\': \'../vendor/selectivizr/selectivizr\'');
@@ -179,22 +182,19 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 
 				deps['paths'].push('\'vendor.respond\': \'../vendor/respondJS/dest/respond.src\'');
 				deps['libs'].push('\'vendor.respond\'');
-				deps['shims'].push('\'vendor.respond\': {\n\t\t\t\t\t\t\t\'exports\': \'respond\'\n\t\t\t\t\t\t}');
+				deps['shims'].push('\'vendor.respond\': {\n\t\t\t\'exports\': \'respond\'\n\t\t}');
 			}
 		} else {
 			deps['paths'].push('\'vendor.jquery\': \'../vendor/jquery/dist/jquery\'');
 			deps['libs'].push('\'vendor.jquery\'');
-			deps['shims'].push('\'vendor.jquery\': {\n\t\t\t\t\t\t\t\'exports\': \'$\'\n\t\t\t\t\t\t}');
+			deps['shims'].push('\'vendor.jquery\': {\n\t\t\t\'exports\': \'$\'\n\t\t}');
 		}
-		this.depsVendorPaths = deps['paths'].join(',\n\t\t\t\t\t\t');
-		this.depsVendorLibs = deps['libs'].join(',\n\t\t\t\t\t\t');
-		this.depsVendorShims = deps['shims'].join(',\n\t\t\t\t\t\t');
-		this.template('_gruntfile.js', this.projectSourceRoot + '/gruntfile.js');
+		this.depsVendorPaths = deps['paths'].join(',\n\t\t');
+		this.depsVendorLibs = deps['libs'].join(',\n\t\t');
+		this.depsVendorShims = deps['shims'].join(',\n\t\t');
+		this.template('js/_config.main.js', this.projectSourceRoot + '/js/config.main.js');
 
-		this.template('_package.json', this.projectSourceRoot + '/package.json');
-
-		this.write(this.projectSourceRoot + '/js/main.js', '');
-		this.write(this.projectSourceRoot + '/js/config.js', '');
+		this.copy('js/main.js', this.projectSourceRoot + '/js/main.js');
 
 		this.copy('sass/_base.spritesheets.scss', this.projectSourceRoot + '/sass/_base.spritesheets.scss');
 		this.copy('sass/_base.typography.scss', this.projectSourceRoot + '/sass/_base.typography.scss');

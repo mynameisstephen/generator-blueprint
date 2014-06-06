@@ -26,18 +26,9 @@ module.exports = function(grunt) {
 			'compile': {
 				'options': {
 					'name': 'main',
-					'mainConfigFile': 'js/config.js',
+					'mainConfigFile': 'js/config.main.js',
 					'baseUrl': 'js/',
 					'logLevel': 1,
-					'paths': {
-						<%= depsVendorPaths %>
-					},
-					'deps': [
-						<%= depsVendorLibs %>
-					],
-					'shim': {
-						<%= depsVendorShims %>
-					},
 					'optimize': 'none',
 					'out': 'bin/js/main.js'
 				}

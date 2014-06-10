@@ -208,7 +208,7 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 		this.template('sass/_main.scss', this.projectSourceRoot + '/sass/main.scss');
 
 		if (this.optionCreateIndex) {
-			this.template('_index.html', this.projectDeployRoot + '/index.html');
+			this.copy('index.html', this.projectDeployRoot + '/index.html');
 		}
 	},
 

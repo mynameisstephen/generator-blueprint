@@ -6,10 +6,10 @@ add_import_path "vendor/foundation/scss"
 http_path = "/"
 
 css_dir = "bin/css"
-fonts_dir = "fonts"
+fonts_dir = "static/fonts"
 javascripts_dir = "js"
 sass_dir = "sass"
-images_dir = "images"
+images_dir = "static/images"
 generated_images_dir = "bin/images/sprites"
 
 sprite_load_path = ["sprites"]

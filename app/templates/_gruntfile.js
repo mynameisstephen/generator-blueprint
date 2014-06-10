@@ -1,20 +1,23 @@
 module.exports = function(grunt) {
 
 	grunt.initConfig({
-		'pkg': grunt.file.readJSON('package.json'),
+		'PACKAGE': grunt.file.readJSON('package.json'),
+
+		'PATH_BIN': 'bin',
+		'PATH_DEPLOY': '<%= pathSourceToDeploy %>',
 
 		'clean': {
 			'options': {
 				'force': true
 			},
 
-			'stage-css': 'bin/css',
-			'stage-js': 'bin/js',
+			'stage-css': '<%%= PATH_BIN %>/css',
+			'stage-js': '<%%= PATH_BIN %>/js',
 
-			'prod-css': '<%= pathSourceToDeploy %>/css',
-			'prod-fonts': '<%= pathSourceToDeploy %>/fonts',
-			'prod-images': '<%= pathSourceToDeploy %>/images',
-			'prod-js': '<%= pathSourceToDeploy %>/js'
+			'prod-css': '<%%= PATH_DEPLOY %>/css',
+			'prod-fonts': '<%%= PATH_DEPLOY %>/fonts',
+			'prod-images': '<%%= PATH_DEPLOY %>/images',
+			'prod-js': '<%%= PATH_DEPLOY %>/js'
 		},
 
 		'compass': {
@@ -30,7 +33,7 @@ module.exports = function(grunt) {
 					'baseUrl': 'js/',
 					'logLevel': 1,
 					'optimize': 'none',
-					'out': 'bin/js/main.js'
+					'out': '<%%= PATH_BIN %>/js/main.js'
 				}
 			}
 		},
@@ -38,16 +41,16 @@ module.exports = function(grunt) {
 		'rename': {
 			'css': {
 				'expand': true,
-				'cwd': 'bin/css/',
+				'cwd': '<%%= PATH_BIN %>/css/',
 				'src': ['*.css', '!*.min.css'],
-				'dest': 'bin/css/',
+				'dest': '<%%= PATH_BIN %>/css/',
 				'ext': '.min.css'
 			},
 			'js': {
 				'expand': true,
-				'cwd': 'bin/js/',
+				'cwd': '<%%= PATH_BIN %>/js/',
 				'src': ['*.js', '!*.min.js'],
-				'dest': 'bin/js/',
+				'dest': '<%%= PATH_BIN %>/js/',
 				'ext': '.min.js'
 			}
 		},
@@ -55,70 +58,79 @@ module.exports = function(grunt) {
 		'cssmin': {
 			'stage': {
 				'options': {
-					'banner': '<%= bannerCSS %>',
-					'keepSpecialComments': 0
+					'banner': '/*! <%%= PACKAGE.name %> <%%= grunt.template.today("dd-mm-yyyy") %> */\\n',
+					'keepSpecialComments': 0,
+					'noAdvanced': true
 				},
 				'expand': true,
-				'cwd': 'bin/css/',
+				'cwd': '<%%= PATH_BIN %>/css/',
 				'src': ['*.css', '!*.min.css'],
-				'dest': 'bin/css/',
+				'dest': '<%%= PATH_BIN %>/css/',
 				'ext': '.min.css'
 			}
 		},
 
 		'uglify': {
-			'main': {
+			'stage': {
 				'options': {
-					'banner': '<%= bannerJS %>'
+					'banner': '/*! <%%= PACKAGE.name %> <%%= grunt.template.today("dd-mm-yyyy") %> */\\n\\n'
 				},
-				'src': 'bin/js/main.js',
-				'dest': 'bin/js/main.min.js'
-			},
-			'vendor': {
-				'files': [{
-					'expand': true,
-					'cwd': 'bin/js/',
-					'src': ['*.js', '!*.min.js', '!main*.js'],
-					'dest': 'bin/js/',
-					'ext': '.min.js'
-				}]
+				'expand': true,
+				'cwd': '<%%= PATH_BIN %>/js/',
+				'src': ['*.js', '!*.min.js'],
+				'dest': '<%%= PATH_BIN %>/js/',
+				'ext': '.min.js'
 			}
 		},
 
 		'copy': {
-			'modernizr': {
-				'src': 'vendor/modernizr/modernizr.js',
-				'dest': 'bin/js/modernizr.js'
+			'static-css': {
+				'expand': true,
+				'cwd': 'static/css/',
+				'src': '**',
+				'dest': '<%%= PATH_BIN %>/css'
+			},
+			'static-js': {
+				'expand': true,
+				'cwd': 'static/js/',
+				'src': '**',
+				'dest': '<%%= PATH_BIN %>/js'
 			},
 
-			'requirejs': {
-				'src': 'vendor/requirejs/require.js',
-				'dest': 'bin/js/require.js'
+			'vendor-css': {
+				'files': [
+				]
+			},
+			'vendor-js': {
+				'files': [
+					{ 'src': 'vendor/modernizr/modernizr.js', 'dest': '<%%= PATH_BIN %>/js/modernizr.js' },
+					{ 'src': 'vendor/requirejs/require.js', 'dest': '<%%= PATH_BIN %>/js/require.js' }
+				]
 			},
 
 			'deploy-css': {
 				'expand': true,
-				'cwd': 'bin/css',
+				'cwd': '<%%= PATH_BIN %>/css',
 				'src': '*.min.css',
-				'dest': '<%= pathSourceToDeploy %>/css'
-			},
-			'deploy-fonts': {
-				'expand': true,
-				'cwd': 'fonts',
-				'src': '*',
-				'dest': '<%= pathSourceToDeploy %>/fonts'
-			},
-			'deploy-images': {
-				'files': [
-					{ 'expand': true, 'cwd': 'images', 'src': '**', 'dest': '<%= pathSourceToDeploy %>/images' },
-					{ 'expand': true, 'cwd': 'bin/images', 'src': '**', 'dest': '<%= pathSourceToDeploy %>/images' }
-				]
+				'dest': '<%%= PATH_DEPLOY %>/css'
 			},
 			'deploy-js': {
 				'expand': true,
-				'cwd': 'bin/js',
+				'cwd': '<%%= PATH_BIN %>/js',
 				'src': '*.min.js',
-				'dest': '<%= pathSourceToDeploy %>/js'
+				'dest': '<%%= PATH_DEPLOY %>/js'
+			},
+			'deploy-static': {
+				'expand': true,
+				'cwd': 'static',
+				'src': ['**', '!css/**', '!js/**'],
+				'dest': '<%%= PATH_DEPLOY %>'
+			},
+			'deploy-sprites': {
+				'expand': true,
+				'cwd': '<%%= PATH_BIN %>/images',
+				'src': '**',
+				'dest': '<%%= PATH_DEPLOY %>/images'
 			}
 		},
 
@@ -148,13 +160,15 @@ module.exports = function(grunt) {
 		[
 			'clean:stage-css',
 			'compass:build',
+			'copy:static-css',
+			'copy:vendor-css',
 			'rename:css',
 			'clean:prod-css',
 			'clean:prod-fonts',
 			'clean:prod-images',
 			'copy:deploy-css',
-			'copy:deploy-fonts',
-			'copy:deploy-images'
+			'copy:deploy-static',
+			'copy:deploy-sprites'
 		]
 	);
 
@@ -163,8 +177,8 @@ module.exports = function(grunt) {
 		[
 			'clean:stage-js',
 			'requirejs:compile',
-			'copy:modernizr',
-			'copy:requirejs',
+			'copy:static-js',
+			'copy:vendor-js',
 			'rename:js',
 			'clean:prod-js',
 			'copy:deploy-js'
@@ -178,13 +192,15 @@ module.exports = function(grunt) {
 		[
 			'clean:stage-css',
 			'compass:build',
+			'copy:static-css',
+			'copy:vendor-css',
 			'cssmin:stage',
 			'clean:prod-css',
 			'clean:prod-fonts',
 			'clean:prod-images',
 			'copy:deploy-css',
-			'copy:deploy-fonts',
-			'copy:deploy-images'
+			'copy:deploy-static',
+			'copy:deploy-sprites'
 		]
 	);
 
@@ -193,10 +209,9 @@ module.exports = function(grunt) {
 		[
 			'clean:stage-js',
 			'requirejs:compile',
-			'copy:modernizr',
-			'copy:requirejs',
-			'uglify:main',
-			'uglify:vendor',
+			'copy:static-js',
+			'copy:vendor-js',
+			'uglify:stage',
 			'clean:prod-js',
 			'copy:deploy-js'
 		]

@@ -7,8 +7,6 @@ var chalk = require('chalk');
 
 var BlueprintGenerator = yeoman.generators.Base.extend({
 	init: function () {
-		this.pkg = require('../package.json');
-
 		this.on('end', function () {
 			if (!this.options['skip-install']) {
 				process.chdir(process.cwd() + '/' + this.projectSourceRoot);
@@ -129,11 +127,14 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 		this.mkdir(this.projectDeployRoot);
 
 		this.mkdir(this.projectSourceRoot);
-		this.mkdir(this.projectSourceRoot + '/fonts');
-		this.mkdir(this.projectSourceRoot + '/images');
 		this.mkdir(this.projectSourceRoot + '/js');
 		this.mkdir(this.projectSourceRoot + '/sass');
 		this.mkdir(this.projectSourceRoot + '/sprites');
+		this.mkdir(this.projectSourceRoot + '/static');
+		this.mkdir(this.projectSourceRoot + '/static/css');
+		this.mkdir(this.projectSourceRoot + '/static/fonts');
+		this.mkdir(this.projectSourceRoot + '/static/images');
+		this.mkdir(this.projectSourceRoot + '/static/js');
 
 		this.copy('.bowerrc', this.projectSourceRoot + '/.bowerrc');
 
@@ -162,8 +163,6 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 
 		this.copy('config.rb', this.projectSourceRoot + '/config.rb');
 
-		this.bannerCSS = '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\\n';
-		this.bannerJS = '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\\n\\n';
 		this.template('_gruntfile.js', this.projectSourceRoot + '/gruntfile.js');
 
 		this.template('_package.json', this.projectSourceRoot + '/package.json');

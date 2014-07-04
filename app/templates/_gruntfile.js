@@ -4,7 +4,7 @@ module.exports = function(grunt) {
 		'PACKAGE': grunt.file.readJSON('package.json'),
 
 		'PATH_BIN': 'bin',
-		'PATH_DEPLOY': '<%= pathSourceToDeploy %>',
+		'PATH_DEPLOY': '<%= paths.sourceToDeploy %>',
 
 		'clean': {
 			'options': {
@@ -58,7 +58,7 @@ module.exports = function(grunt) {
 		'cssmin': {
 			'stage': {
 				'options': {
-					'banner': '/*! <%%= PACKAGE.name %> <%%= grunt.template.today("dd-mm-yyyy") %> */\\n',
+					'banner': '/*! <%%= PACKAGE.name %> <%%= grunt.template.today("dd-mm-yyyy") %> */',
 					'keepSpecialComments': 0,
 					'noAdvanced': true
 				},
@@ -73,7 +73,7 @@ module.exports = function(grunt) {
 		'uglify': {
 			'stage': {
 				'options': {
-					'banner': '/*! <%%= PACKAGE.name %> <%%= grunt.template.today("dd-mm-yyyy") %> */\\n\\n'
+					'banner': '/*! <%%= PACKAGE.name %> <%%= grunt.template.today("dd-mm-yyyy") %>\n */'
 				},
 				'expand': true,
 				'cwd': '<%%= PATH_BIN %>/js/',

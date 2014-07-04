@@ -1,9 +1,9 @@
 {
-	"name": "<%= projectName %>",
+	"name": "<%= project.name %>",
 	"version": "0.0.0",
-	"description": "<%= projectDescription %>",
+	"description": "<%= project.description %>",
 	"authors": [
-		"<%= projectAuthor %>"
+		"<%= project.author %>"
 	],
 	"private": true,
 	"ignore": [
@@ -11,6 +11,6 @@
 		"vendor"
 	],
 	"dependencies": {
-		<%= depsBower %>
+		<%= dependencies.bower.join(',\n\t\t') %>
 	}
 }

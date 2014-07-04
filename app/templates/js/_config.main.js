@@ -1,11 +1,11 @@
 require.config({
 	'paths': {
-		<%= depsVendorPaths %>
+		<%= dependencies.require.paths.join(',\n\t\t') %>
 	},
 	'deps': [
-		<%= depsVendorLibs %>
+		<%= dependencies.require.deps.join(',\n\t\t') %>
 	],
 	'shim': {
-		<%= depsVendorShims %>
+		<%= dependencies.require.shim.join(',\n\t\t') %>
 	}
 });

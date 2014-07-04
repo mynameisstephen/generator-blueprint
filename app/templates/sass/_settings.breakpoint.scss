@@ -1,0 +1,39 @@
+//$breakpoint-default-media:      all;
+//$breakpoint-default-feature:    min-width;
+//$breakpoint-default-pair:       width;
+
+// Transforms
+//$breakpoint-force-media-all:    false;
+//$breakpoint-to-ems:             false;
+//$breakpoint-resolutions:        true;
+
+// No Query Options
+//$breakpoint-no-queries:         false;
+//$breakpoint-no-query-fallbacks: false;
+
+// Base Font Size
+//$breakpoint-base-font-size:     16px;
+
+// Legacy Syntax Support
+//$breakpoint-legacy-syntax:      false;
+
+@import 'breakpoint';
+
+$breakpoint-small: (1px 640px);
+$breakpoint-medium: (641px 1024px);
+$breakpoint-large: (1025px 10000px);
+
+$breakpoints: add-breakpoint('small up', nth($breakpoint-small, 1));
+$breakpoints: add-breakpoint('small only', nth($breakpoint-small, 1) nth($breakpoint-small, -1));
+
+$breakpoints: add-breakpoint('medium up', nth($breakpoint-medium, 1));
+$breakpoints: add-breakpoint('medium only', nth($breakpoint-medium, 1) nth($breakpoint-medium, -1));
+
+$breakpoints: add-breakpoint('large up', nth($breakpoint-large, 1));
+$breakpoints: add-breakpoint('large only', nth($breakpoint-large, 1) nth($breakpoint-large, -1));
+
+/*
+	@include respond-to('medium up') {
+		//
+	}
+*/

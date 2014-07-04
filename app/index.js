@@ -9,7 +9,7 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 	init: function () {
 		this.on('end', function () {
 			if (!this.options['skip-install']) {
-				process.chdir(process.cwd() + '/' + this.projectSourceRoot);
+				process.chdir(process.cwd() + '/' + this.paths.source);
 
 				this.installDependencies({
 					'callback': function() {
@@ -47,10 +47,14 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 			'message': 'Are you supporting IE8?',
 			'default': true
 		}, {
-			'name': 'optionResponsive',
-			'type': 'confirm',
-			'message': 'Is it responsive?',
-			'default': true
+			'name': 'optionCSSFramework',
+			'type': 'list',
+			'message': 'Which CSS Framework do you want to use?',
+			'choices': [
+				{ 'name': 'None', 'value': 'none' },
+				{ 'name': 'Jeet/Breakpoint-Sass', 'value': 'jeet-bps' },
+				{ 'name': 'Zurb Foundation', 'value': 'zurb' }
+			]
 		}, {
 			'name': 'projectSourceRoot',
 			'message': 'What is the path to the project source root?',
@@ -58,7 +62,7 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 		}, {
 			'name': 'projectDeployRoot',
 			'message': 'What is the path to the project deploy root?',
-			'default': 'publish'
+			'default': 'deploy'
 		}, {
 			'name': 'optionCreateIndex',
 			'type': 'confirm',
@@ -70,39 +74,35 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 			var sourceDirectories = null;
 			var deployDirectories = null;
 
-			this.projectName = props.projectName;
-			this.projectDescription = props.projectDescription;
-			this.projectAuthor = props.projectAuthor;
-			this.optionIE8 = props.optionIE8;
-			this.optionResponsive = props.optionResponsive;
-			this.projectSourceRoot = props.projectSourceRoot;
-			this.projectDeployRoot = props.projectDeployRoot;
-			this.optionCreateIndex = props.optionCreateIndex;
+			this.project = {
+				'name': props.projectName,
+				'description': props.projectDescription,
+				'author': props.projectAuthor
+			};
 
-			sourceDirectories = this.projectSourceRoot.split(/[\\/]+/);
-			deployDirectories = this.projectDeployRoot.split(/[\\/]+/);
+			this.options = {
+				'IE8': props.optionIE8,
+				'CSSFramework': props.optionCSSFramework,
+				'index': props.optionCreateIndex
+			};
 
-			if (sourceDirectories.length > 0) {
-				if (sourceDirectories[0] == '') {
-					sourceDirectories.unshift();
+			this.paths = {
+				'source': props.projectSourceRoot,
+				'deploy': props.projectDeployRoot
+			};
+
+			sourceDirectories = this.paths.source.split(/[\\/]+/);
+			deployDirectories = this.paths.deploy.split(/[\\/]+/);
+
+			for (var s = sourceDirectories.length - 1; s >= 0; s--) {
+				if (sourceDirectories[s] == '') {
+					sourceDirectories.splice(s, 1);
 				}
 			}
 
-			if (sourceDirectories.length > 0) {
-				if (sourceDirectories[sourceDirectories.length - 1] == '') {
-					sourceDirectories.pop();
-				}
-			}
-
-			if (deployDirectories.length > 0) {
-				if (deployDirectories[0] == '') {
-					deployDirectories.unshift();
-				}
-			}
-
-			if (deployDirectories.length > 0) {
-				if (deployDirectories[deployDirectories.length - 1] == '') {
-					deployDirectories.pop();
+			for (var d = deployDirectories.length - 1; d >= 0; d--) {
+				if (deployDirectories[d] == '') {
+					deployDirectories.splice(d, 1);
 				}
 			}
 
@@ -111,104 +111,146 @@ var BlueprintGenerator = yeoman.generators.Base.extend({
 				deployDirectories.shift();
 			}
 
-			this.pathSourceToDeploy = '';
+			this.paths.sourceToDeploy = '';
 			for (var d = 0; d < sourceDirectories.length; d++) {
-				this.pathSourceToDeploy = this.pathSourceToDeploy + '../';
+				this.paths.sourceToDeploy = this.paths.sourceToDeploy + '../';
 			}
-			this.pathSourceToDeploy = this.pathSourceToDeploy + deployDirectories.join('/');
+			this.paths.sourceToDeploy = this.paths.sourceToDeploy + deployDirectories.join('/');
 
 			done();
 		}.bind(this));
 	},
 
   	app: function () {
-  		var deps = {};
+  		this.dependencies = {
+  			'bower': [],
+  			'compass': [],
+  			'require': {
+  				'paths': [],
+  				'deps': [],
+  				'shim': []
+  			},
+  			'sass': []
+  		};
 
-		this.mkdir(this.projectDeployRoot);
+		this.dependencies.bower.push(
+			'"normalize-css": "~3.0.1"',
+			'"modernizr": "~2.7.2"',
+			'"requirejs": "~2.1.11"'
+		);
 
-		this.mkdir(this.projectSourceRoot);
-		this.mkdir(this.projectSourceRoot + '/js');
-		this.mkdir(this.projectSourceRoot + '/sass');
-		this.mkdir(this.projectSourceRoot + '/sprites');
-		this.mkdir(this.projectSourceRoot + '/static');
-		this.mkdir(this.projectSourceRoot + '/static/css');
-		this.mkdir(this.projectSourceRoot + '/static/fonts');
-		this.mkdir(this.projectSourceRoot + '/static/images');
-		this.mkdir(this.projectSourceRoot + '/static/js');
+		this.dependencies.require.paths.push('\'vendor/JQuery\': \'../vendor/jquery/dist/jquery\'');
+		this.dependencies.require.deps.push('\'vendor/JQuery\'');
+		this.dependencies.require.shim.push('\'vendor/JQuery\': {\n\t\t\t\'exports\': \'$\'\n\t\t}');
 
-		this.copy('.bowerrc', this.projectSourceRoot + '/.bowerrc');
+		if (this.options.IE8) {
+			this.dependencies.bower.push(
+				'"jquery": "~1.11.0"',
+				'"selectivizr": "https://github.com/keithclark/selectivizr.git#ed2f5e3e56f059ad256cc921e24ecc0e1855f18a"'
+			);
 
-		deps['bower'] = [];
-
-		deps['bower'].push('"normalize-css": "~3.0.1"');
-		deps['bower'].push('"modernizr": "~2.7.2"');
-		deps['bower'].push('"requirejs": "~2.1.11"');
-		if (this.optionIE8) {
-			deps['bower'].push('"jquery": "~1.11.0"');
-
-			if (this.optionResponsive) {
-				deps['bower'].push('"respondJS": "~1.4.2"');
-				deps['bower'].push('"foundation": "~4.3.2"');
-			}
-			deps['bower'].push('"selectivizr": "https://github.com/keithclark/selectivizr.git#ed2f5e3e56f059ad256cc921e24ecc0e1855f18a"');
+			this.dependencies.require.paths.push('\'vendor/Selectivizr\': \'../vendor/selectivizr/selectivizr\'');
+			this.dependencies.require.deps.push('\'vendor/Selectivizr\'');
 		} else {
-			deps['bower'].push('"jquery": "~2.1.0"');
-
-			if (this.optionResponsive) {
-				deps['bower'].push('"foundation": "~5.2.2"');
-			}
+			this.dependencies.bower.push('"jquery": "~2.1.0"');
 		}
-		this.depsBower = deps['bower'].join(',\n\t\t');
-		this.template('_bower.json', this.projectSourceRoot + '/bower.json');
 
-		this.copy('config.rb', this.projectSourceRoot + '/config.rb');
+		switch (this.options.CSSFramework) {
+			case 'jeet-bps':
+				if (this.options.IE8) {
+					this.dependencies.bower.push('"respondJS": "~1.4.2"');
 
-		this.template('_gruntfile.js', this.projectSourceRoot + '/gruntfile.js');
+					this.dependencies.require.paths.push('\'vendor/Respond\': \'../vendor/respondJS/dest/respond.src\'');
+					this.dependencies.require.deps.push('\'vendor/Respond\'');
+					this.dependencies.require.shim.push('\'vendor/Respond\': {\n\t\t\t\'exports\': \'respond\'\n\t\t}');
+				}
 
-		this.template('_package.json', this.projectSourceRoot + '/package.json');
+				this.dependencies.bower.push(
+					'"jeet.gs": "~5.1.3"',
+					'"breakpoint-sass": "~2.4.2"'
+				);
 
-		deps['paths'] = [];
-		deps['libs'] = [];
-		deps['shims'] = [];
-		if (this.optionIE8) {
-			deps['paths'].push('\'vendor.jquery\': \'../vendor/jquery/dist/jquery\'');
-			deps['libs'].push('\'vendor.jquery\'');
-			deps['shims'].push('\'vendor.jquery\': {\n\t\t\t\'exports\': \'$\'\n\t\t}');
+				this.dependencies.compass.push('add_import_path "vendor/jeet.gs/scss/jeet"');
+				this.dependencies.compass.push('add_import_path "vendor/breakpoint-sass/stylesheets"');
 
-			if (this.optionResponsive) {
-				deps['paths'].push('\'vendor.selectivizr\': \'../vendor/selectivizr/selectivizr\'');
-				deps['libs'].push('\'vendor.selectivizr\'');
+				this.dependencies.sass.push(
+					'@import "settings.jeet";',
+					'@import "settings.breakpoint";'
+				);
 
-				deps['paths'].push('\'vendor.respond\': \'../vendor/respondJS/dest/respond.src\'');
-				deps['libs'].push('\'vendor.respond\'');
-				deps['shims'].push('\'vendor.respond\': {\n\t\t\t\'exports\': \'respond\'\n\t\t}');
-			}
-		} else {
-			deps['paths'].push('\'vendor.jquery\': \'../vendor/jquery/dist/jquery\'');
-			deps['libs'].push('\'vendor.jquery\'');
-			deps['shims'].push('\'vendor.jquery\': {\n\t\t\t\'exports\': \'$\'\n\t\t}');
+				break;
+			case 'zurb':
+				if (this.options.IE8) {
+					this.dependencies.bower.push(
+						'"respondJS": "~1.4.2"',
+						'"foundation": "~4.3.2"'
+					);
+
+					this.dependencies.require.paths.push('\'vendor/Respond\': \'../vendor/respondJS/dest/respond.src\'');
+					this.dependencies.require.deps.push('\'vendor/Respond\'');
+					this.dependencies.require.shim.push('\'vendor/Respond\': {\n\t\t\t\'exports\': \'respond\'\n\t\t}');
+				} else {
+					this.dependencies.bower.push('"foundation": "~5.2.2"')
+				}
+
+				this.dependencies.compass.push('add_import_path "vendor/foundation/scss"');
+
+				this.dependencies.sass.push('@import "settings.foundation";');
+
+				break;
+			default:
+				// No framework
+				break;
 		}
-		this.depsVendorPaths = deps['paths'].join(',\n\t\t');
-		this.depsVendorLibs = deps['libs'].join(',\n\t\t');
-		this.depsVendorShims = deps['shims'].join(',\n\t\t');
-		this.template('js/_config.main.js', this.projectSourceRoot + '/js/config.main.js');
 
-		this.copy('js/main.js', this.projectSourceRoot + '/js/main.js');
+		this.mkdir(this.paths.deploy);
 
-		this.copy('sass/_base.spritesheets.scss', this.projectSourceRoot + '/sass/_base.spritesheets.scss');
-		this.copy('sass/_base.typography.scss', this.projectSourceRoot + '/sass/_base.typography.scss');
-		this.copy('sass/_settings.compass.scss', this.projectSourceRoot + '/sass/_settings.compass.scss');
-		if (this.optionResponsive) {
-			if (this.optionIE8) {
-				this.copy('sass/_settings.foundation-ie8.scss', this.projectSourceRoot + '/sass/_settings.foundation.scss');
-			} else {
-				this.copy('sass/_settings.foundation.scss', this.projectSourceRoot + '/sass/_settings.foundation.scss');
-			}
+		this.mkdir(this.paths.source);
+		this.mkdir(this.paths.source + '/js');
+		this.mkdir(this.paths.source + '/sass');
+		this.mkdir(this.paths.source + '/sprites');
+		this.mkdir(this.paths.source + '/static');
+		this.mkdir(this.paths.source + '/static/css');
+		this.mkdir(this.paths.source + '/static/fonts');
+		this.mkdir(this.paths.source + '/static/images');
+		this.mkdir(this.paths.source + '/static/js');
+
+		this.copy('.bowerrc', this.paths.source + '/.bowerrc');
+		this.template('_bower.json', this.paths.source + '/bower.json');
+		this.template('_config.rb', this.paths.source + '/config.rb');
+		this.template('_gruntfile.js', this.paths.source + '/gruntfile.js');
+		this.template('_package.json', this.paths.source + '/package.json');
+
+		this.template('js/_config.main.js', this.paths.source + '/js/config.main.js');
+		this.copy('js/main.js', this.paths.source + '/js/main.js');
+
+		this.copy('sass/_base.spritesheets.scss', this.paths.source + '/sass/_base.spritesheets.scss');
+		this.copy('sass/_base.typography.scss', this.paths.source + '/sass/_base.typography.scss');
+		this.copy('sass/_settings.compass.scss', this.paths.source + '/sass/_settings.compass.scss');
+
+		switch (this.options.CSSFramework) {
+			case 'jeet-bps':
+				this.copy('sass/_settings.jeet.scss', this.paths.source + '/sass/_settings.jeet.scss');
+				this.copy('sass/_settings.breakpoint.scss', this.paths.source + '/sass/_settings.breakpoint.scss');
+
+				break;
+			case 'zurb':
+				if (this.options.IE8) {
+					this.copy('sass/_settings.foundation-ie8.scss', this.paths.source + '/sass/_settings.foundation.scss');
+				} else {
+					this.copy('sass/_settings.foundation.scss', this.paths.source + '/sass/_settings.foundation.scss');
+				}
+
+				break;
+			default:
+				// No framework
+				break;
 		}
-		this.template('sass/_main.scss', this.projectSourceRoot + '/sass/main.scss');
 
-		if (this.optionCreateIndex) {
-			this.copy('index.html', this.projectDeployRoot + '/index.html');
+		this.template('sass/_main.scss', this.paths.source + '/sass/main.scss');
+
+		if (this.options.index) {
+			this.copy('index.html', this.paths.deploy + '/index.html');
 		}
 	},
 

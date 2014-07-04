@@ -1,9 +1,7 @@
 @import "base.normalize";
 
-@import "settings.compass";<%
-	if (optionResponsive) {
-		print('\n@import "settings.foundation";');
-	}  %>
+@import "settings.compass";
+<%= dependencies.sass.join('\n') %>
 
 @import "base.spritesheets";
 @import "base.typography";

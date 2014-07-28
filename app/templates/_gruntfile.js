@@ -73,7 +73,7 @@ module.exports = function(grunt) {
 		'uglify': {
 			'stage': {
 				'options': {
-					'banner': '/*! <%%= PACKAGE.name %> <%%= grunt.template.today("dd-mm-yyyy") %>\n */'
+					'banner': '/*! <%%= PACKAGE.name %> <%%= grunt.template.today("dd-mm-yyyy") %> */\n'
 				},
 				'expand': true,
 				'cwd': '<%%= PATH_BIN %>/js/',
